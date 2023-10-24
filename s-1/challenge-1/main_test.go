@@ -4,23 +4,17 @@ import (
 	"io"
 	"os"
 	"strings"
-	"sync"
 	"testing"
 )
 
 func Test_updateMessage(t *testing.T) {
-	var wg sync.WaitGroup
-	var testString = "TEST_STRING"
 	wg.Add(1)
-
-	go updateMessage(testString, &wg)
+	go updateMessage("Epsilon")
 	wg.Wait()
 
-	if !strings.Contains(msg, testString) {
-		t.Error("Error, msg value is not what it is expected: " + testString)
+	if msg != "Epsilon" {
+		t.Error("Expected to find epsilon, but it is not there")
 	}
-
-	
 }
 
 func Test_printMessage(t *testing.T) {
@@ -29,46 +23,45 @@ func Test_printMessage(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	msg = "TESTING_STRING"
+	msg = "epsilon"
 
 	printMessage()
 
-	result, _ := io.ReadAll(r)
+	_ = w.Close()
 
+	result, _ := io.ReadAll(r)
 	output := string(result)
 
 	os.Stdout = stdOut
-
-	if !strings.Contains(output, "TESTING_STRING") {
-		t.Error("output of printMessage expected 'TESTING_STRING', recieved something else")
+	if !strings.Contains(output, "epsilon") {
+		t.Error("Expected to find epsilon, but it is not there")
 	}
 }
 
 func Test_main(t *testing.T) {
-
-	orderedOutput := make([]string, 3)
-	orderedOutput[0] = "Hello, universe!"
-	orderedOutput[1] = "Hello, cosmos!"
-	orderedOutput[2] = "Hello, world!"
 
 	stdOut := os.Stdout
 
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	result, _ := io.ReadAll(r)
+	main()
 
+	_ = w.Close()
+
+	result, _ := io.ReadAll(r)
 	output := string(result)
 
 	os.Stdout = stdOut
 
-	var expectedOutput string
-	for _, value := range orderedOutput {
-		expectedOutput += value + "/n"
+	if !strings.Contains(output, "Hello, universe!") {
+		t.Error("Expected to find Hello, universe! but it is not there!")
+	}
+	if !strings.Contains(output, "Hello, cosmos!") {
+		t.Error("Expected to find Hello cosmos, but it is not there!")
 	}
 
-	if !strings.Contains(output, expectedOutput) {
-		t.Error("Expected: " + expectedOutput + "\n\nrecieved:" + output)
+	if !strings.Contains(output, "Hello, world!") {
+		t.Error("Expected to find Hello, World! but it is not there!")
 	}
-
 }
