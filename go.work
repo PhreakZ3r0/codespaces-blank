@@ -1,6 +1,7 @@
 go 1.21.2
 
 use (
+	./dining-philosophers
 	./producer-consumer
 	./s-3/example2
 )
